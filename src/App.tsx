@@ -3,7 +3,7 @@ import { useState } from "react";
 function App() {
   const [count, setCount] = useState(0);
 
-  return <>asdf</>;
+  return <div className="text-red-500">asdf</div>;
 }
 
 export default App;
