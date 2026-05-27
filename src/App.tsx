@@ -1,9 +1,8 @@
-import { useState } from "react";
+import StateColocation from "./components/StateColocation";
+import ComponentComposition from "./components/ComponentComposition.jsx";
 
 function App() {
-  const [count, setCount] = useState(0);
-
-  return <div className="text-red-500">asdf</div>;
+  return <StateColocation />;
 }
 
 export default App;
