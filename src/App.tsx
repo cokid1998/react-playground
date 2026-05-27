@@ -1,8 +1,13 @@
 import StateColocation from "./components/StateColocation";
-import ComponentComposition from "./components/ComponentComposition.jsx";
+import ComponentComposition from "./components/ComponentComposition";
 
 function App() {
-  return <StateColocation />;
+  return (
+    <>
+      {/* <StateColocation /> */}
+      <ComponentComposition />
+    </>
+  );
 }
 
 export default App;
