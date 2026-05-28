@@ -1,9 +1,13 @@
-import { useState } from "react";
+import ResponsiveTooltip from "./components/tooltip/ResponsiveTooltip";
+import ResponsiveTooltipUseEffect from "./components/tooltip/ResponsiveTooltipUseEffect";
 
 function App() {
-  const [count, setCount] = useState(0);
-
-  return <div className="text-red-500">asdf</div>;
+  return (
+    <div className="h-[150vh] p-25">
+      {/* <ResponsiveTooltipUseEffect /> */}
+      <ResponsiveTooltip />
+    </div>
+  );
 }
 
 export default App;
