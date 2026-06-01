@@ -1,0 +1,22 @@
+.shake-box {
+  width: 150px;
+  height: 150px;
+  background-color: #ff4d4f;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+/* 흔들림 효과 애니메이션 */
+.apply-shake {
+  animation: shake-animation 0.4s ease-in-out;
+}
+
+@keyframes shake-animation {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
