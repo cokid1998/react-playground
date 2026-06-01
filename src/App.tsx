@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import SecureInput from "./SecureInput";
 
 function App() {
-  const [count, setCount] = useState(0);
-
-  return <div className="text-red-500">asdf</div>;
+  const apiRef = useRef();
+  return <SecureInput ref={apiRef} />;
 }
 
 export default App;
