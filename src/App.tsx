@@ -1,8 +1,8 @@
-import { useUnSlicePatternStore } from "./store/unSlicePatternStore/Store";
+import { useSlicePatternStore } from "./store/SlicePatternStore";
 
 function App() {
-  const { isLogged, token, login, logOut, theme, setTheme } =
-    useUnSlicePatternStore();
+  const { isLogged, token, theme, login, logOut, setTheme } =
+    useSlicePatternStore();
 
   return (
     <div>
