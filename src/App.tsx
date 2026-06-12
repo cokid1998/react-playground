@@ -1,4 +1,5 @@
 import useStore from "./store/Store";
+import { useShallow } from "zustand/shallow";
 
 // 아래와 같이 상태를 가져오면 무한 루프 발생!
 // 원래 가지고 있던 상태의 주소와 다른 새로운 주소를 가진 객체 리터럴을 반환하기 때문
@@ -43,15 +44,20 @@ function TokenComp() {
    * const login = useStore((state) => state.login);
    * const logout = useStore((state) => state.logout);
    *
-   * 해결법 2: useShallow사용
+   * 해결법 2: useShallow 사용
    *
-   * 해결법 3: 커스텀 동등성 함수 사용
+   * 해결법 3: 커스텀 동등성 함수 사용 (zustand v5에서는 사라짐)
+   * https://zustand.docs.pmnd.rs/reference/migrations/migrating-to-v5
+   * lodash와 useStoreWithEqualityFn라는걸 사용하면 사용할수는 있음
    */
-  const { token, login, logout } = useStore((state) => ({
-    token: state.token,
-    login: state.login,
-    logout: state.logout,
-  }));
+  const { token, login, logout } = useStore(
+    useShallow((state) => ({
+      token: state.token,
+      login: state.login,
+      logout: state.logout,
+    })),
+  );
+
   console.log("토큰 컴포넌트 리렌더");
 
   return (
@@ -70,13 +76,9 @@ function TokenComp() {
 function ThemeComp() {
   // const { theme, setTheme } = useStore();
 
-  // const theme = useStore((state) => state.theme);
-  // const setTheme = useStore((state) => state.setTheme);
+  const theme = useStore((state) => state.theme);
+  const setTheme = useStore((state) => state.setTheme);
 
-  const { theme, setTheme } = useStore((state) => ({
-    theme: state.theme,
-    setTheme: state.setTheme,
-  }));
   console.log("테마 컴포넌트 리렌더");
 
   return (
@@ -92,13 +94,9 @@ function ThemeComp() {
 function UserComp() {
   // const { user, setName } = useStore();
 
-  // const user = useStore((state) => state.user);
-  // const setName = useStore((state) => state.setName);
+  const user = useStore((state) => state.user);
+  const setName = useStore((state) => state.setName);
 
-  const { user, setName } = useStore((state) => ({
-    user: state.user,
-    setName: state.setName,
-  }));
   console.log("유저 컴포넌트 리렌더");
 
   return (
