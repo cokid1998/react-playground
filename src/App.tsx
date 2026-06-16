@@ -14,16 +14,10 @@ interface ServerPayload {
 
 interface UIState {
   title: string;
-  // 첫번째 고민.. front에서는 label과 value라는 프로퍼티로 넣고싶은데 서버에서는
-  // id랑 name이라는 이름으로 들어옴
-  // categories: CategoriesResponse;
-
-  // 해결볍 1
-  // categories: {
-  //   label: string;
-  //   value: number;
-  // };
-
+  // 두번째 문제
+  // 기획에서 select의 첫번째 option태그는 "선택안함"을 보여줘야함
+  // categories 타입에 null이 추가 됨
+  categories: CategoriesResponse | null;
   price: number;
   isPublished: boolean;
 }
@@ -37,14 +31,6 @@ function App() {
       const res = await fetch("http://localhost:3001/categories");
       const categoriesData: CategoriesResponse[] = await res.json();
       setCategories(categoriesData);
-      /*
-        해결법 2
-        const formmatedCategories = categories.map((cat) => ({
-          label: cat.name,
-          value: cat.id,
-        }));
-        setCategories(formmatedCategories);
-       */
     };
     fetchCategories();
   }, []);
@@ -53,6 +39,7 @@ function App() {
     <form className="flex flex-col w-50">
       <input className="border" value={form?.title} />
       <select className="border">
+        <option value={""}>선택 안함</option>
         {categories?.map((cat) => (
           <option key={cat.id} value={cat.id}>
             {cat.name}
@@ -66,7 +53,3 @@ function App() {
 }
 
 export default App;
-
-// 첫번째 고민.. UIState타입에서는 label과 value라는 프로퍼티로 넣고싶은데 서버에서는 id랑 name이라는 이름으로 들어옴
-// 해결법 1. 그냥 UIState의 label과 value는 id와 name으로 바꿈
-// 해결법 2. 가져올 때 가공해서 가져옴 ✅
