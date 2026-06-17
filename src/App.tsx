@@ -14,9 +14,10 @@ interface ServerPayload {
 
 interface UIState {
   title: string;
-  // 두번째 문제
-  // 기획에서 select의 첫번째 option태그는 "선택안함"을 보여줘야함
-  // categories 타입에 null이 추가 됨
+  /*
+    기획요구사항: select의 첫번째 option태그는 "코스 선택"을 보여줘야함
+    categories 타입에 null이 추가 됨
+  */
   categories: CategoriesResponse | null;
   price: number;
   isPublished: boolean;
@@ -24,7 +25,12 @@ interface UIState {
 
 function App() {
   const [categories, setCategories] = useState<CategoriesResponse[]>([]);
-  const [form, setForm] = useState<UIState | null>(null);
+  const [form, setForm] = useState<UIState>({
+    title: "",
+    categories: null,
+    price: 0,
+    isPublished: false,
+  });
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -35,20 +41,80 @@ function App() {
     fetchCategories();
   }, []);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value, checked, type } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [id]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+
+    if (value === "") {
+      setForm((prev) => ({ ...prev, categories: null }));
+      return;
+    }
+
+    const selectedCategory =
+      /* DOM에서 가져오는 value는 string이기 때문에 number로 변환해줘야함 */
+      categories.find((cat) => cat.id === Number(value)) ?? null;
+
+    setForm((prev) => ({
+      ...prev,
+      categories: selectedCategory,
+    }));
+  };
+
   return (
-    <form className="flex flex-col w-50">
-      <input className="border" value={form?.title} />
-      <select className="border">
-        <option value={""}>선택 안함</option>
-        {categories?.map((cat) => (
-          <option key={cat.id} value={cat.id}>
-            {cat.name}
-          </option>
-        ))}
-      </select>
-      <input className="border" type="number" />
-      <input type="radio" />
-    </form>
+    <div className="flex flex-col gap-10">
+      <form className="flex flex-col w-50">
+        <input
+          className="border"
+          id={"title"}
+          value={form?.title}
+          onChange={handleInputChange}
+        />
+        <select
+          id="categories"
+          className="border"
+          onChange={handleSelectChange}
+        >
+          {/*
+            option의 value에 UIState의 categories타입의 유니온 타입인 null을 넣고싶은데 value에 null을 넣을 수 없음
+            그래서 빈 문자열을 넣어야함
+          */}
+          <option value={""}>코스 선택</option>
+          {categories?.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+        <input
+          className="border"
+          id="price"
+          type="number"
+          onChange={handleInputChange}
+        />
+        <input
+          type="checkbox"
+          id="isPublished"
+          onChange={handleInputChange}
+          checked={form.isPublished}
+        />
+      </form>
+
+      <div className="border w-50">
+        <div>이름: {form.title}</div>
+        {/* 이 UI때문에 form 상태의 카테고리를 객체로 value와 name을 가지는 객체로 만들 수 밖에 없음  */}
+        <div>선택한 카테고리: {form.categories?.name}</div>
+        <div>가격: {form.price}</div>
+        <div>isPublished: {form.isPublished + ""}</div>
+      </div>
+    </div>
   );
 }
 
