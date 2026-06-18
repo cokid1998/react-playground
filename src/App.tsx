@@ -19,7 +19,11 @@ interface UIState {
     categories 타입에 null이 추가 됨
   */
   categories: CategoriesResponse | null;
-  price: number;
+  /**
+   * 기획 요구사항: price는 콤마를 찍어야하며, 초기값은 0이아니라 빈문자열이여야한다.
+   * 그렇기 때문에 price는 number에서 string으로 바꿔야하는 상황이 됨
+   */
+  price: string;
   isPublished: boolean;
 }
 
@@ -28,7 +32,7 @@ function App() {
   const [form, setForm] = useState<UIState>({
     title: "",
     categories: null,
-    price: 0,
+    price: "",
     isPublished: false,
   });
 
@@ -43,6 +47,18 @@ function App() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value, checked, type } = e.target;
+
+    /**
+     * price에 콤마를 찍어야하는 요구사항 때문에 점점 변환로직이 파편화 되고있음
+     */
+    if (id === "price") {
+      const numeric = value.replace(/[^0-9]/g, "");
+      setForm((prev) => ({
+        ...prev,
+        price: numeric === "" ? "" : Number(numeric).toLocaleString(),
+      }));
+      return;
+    }
 
     setForm((prev) => ({
       ...prev,
@@ -81,6 +97,7 @@ function App() {
           id="categories"
           className="border"
           onChange={handleSelectChange}
+          value={form.categories?.id}
         >
           {/*
             option의 value에 UIState의 categories타입의 유니온 타입인 null을 넣고싶은데 value에 null을 넣을 수 없음
@@ -96,8 +113,9 @@ function App() {
         <input
           className="border"
           id="price"
-          type="number"
+          type="text"
           onChange={handleInputChange}
+          value={form.price}
         />
         <input
           type="checkbox"
