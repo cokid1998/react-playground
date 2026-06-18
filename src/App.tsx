@@ -84,9 +84,37 @@ function App() {
     }));
   };
 
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // 유효성 검사
+    if (!form.categories) {
+      alert("카테고리를 선택해주세요");
+      return;
+    }
+
+    const payload: ServerPayload = {
+      title: form.title,
+      categoryId: form.categories.id,
+      // price에 넣어준 콤마를 제거하는 코드
+      price: Number(form.price.replace(/,/g, "")),
+      isPublished: form.isPublished ? "Y" : "N",
+    };
+
+    const postData = async () => {
+      const res = await fetch("http://localhost:3001/courses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      console.log(res);
+    };
+    postData();
+  };
+
   return (
     <div className="flex flex-col gap-10">
-      <form className="flex flex-col w-50">
+      <form className="flex flex-col w-50" onSubmit={onSubmit}>
         <input
           className="border"
           id={"title"}
@@ -123,6 +151,9 @@ function App() {
           onChange={handleInputChange}
           checked={form.isPublished}
         />
+        <button className="border" type="submit">
+          제출
+        </button>
       </form>
 
       <div className="border w-50">
