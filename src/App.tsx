@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 
+// 1. UI와 서버 타입을 분리했을 때 나타나는 이슈
+// 2. UI, 서버 타입 분리로 인해 작성해야하는 변환로직 이슈
+
 interface CategoriesResponse {
   id: number;
   name: string;
@@ -18,11 +21,13 @@ interface UIState {
     기획요구사항: select의 첫번째 option태그는 "코스 선택"을 보여줘야함
     categories 타입에 null이 추가 됨
   */
+  // 1. UI와 서버 타입을 분리했을 때 나타나는 이슈
   categories: CategoriesResponse | null;
   /**
    * 기획 요구사항: price는 콤마를 찍어야하며, 초기값은 0이아니라 빈문자열이여야한다.
    * 그렇기 때문에 price는 number에서 string으로 바꿔야하는 상황이 됨
    */
+  // 1. UI와 서버 타입을 분리했을 때 나타나는 이슈
   price: string;
   isPublished: boolean;
 }
@@ -51,6 +56,7 @@ function App() {
     /**
      * price에 콤마를 찍어야하는 요구사항 때문에 점점 변환로직이 파편화 되고있음
      */
+    // 2. UI, 서버 타입 분리로 인해 작성해야하는 변환로직 이슈
     if (id === "price") {
       const numeric = value.replace(/[^0-9]/g, "");
       setForm((prev) => ({
@@ -70,6 +76,7 @@ function App() {
     const { value } = e.target;
 
     if (value === "") {
+      // 1. UI와 서버 타입을 분리했을 때 나타나는 이슈
       setForm((prev) => ({ ...prev, categories: null }));
       return;
     }
@@ -97,7 +104,10 @@ function App() {
       title: form.title,
       categoryId: form.categories.id,
       // price에 넣어준 콤마를 제거하는 코드
+      // 2. UI, 서버 타입 분리로 인해 작성해야하는 변환로직 이슈
       price: Number(form.price.replace(/,/g, "")),
+      // 변환로직
+      // 2. UI, 서버 타입 분리로 인해 작성해야하는 변환로직 이슈
       isPublished: form.isPublished ? "Y" : "N",
     };
 
@@ -118,19 +128,22 @@ function App() {
         <input
           className="border"
           id={"title"}
-          value={form?.title}
+          value={form.title}
           onChange={handleInputChange}
         />
         <select
           id="categories"
           className="border"
           onChange={handleSelectChange}
-          value={form.categories?.id}
+          // null을 DOM에 넣을 수 없어서 ""으로 변환하는 코드
+          value={form.categories?.id ?? ""}
         >
           {/*
             option의 value에 UIState의 categories타입의 유니온 타입인 null을 넣고싶은데 value에 null을 넣을 수 없음
             그래서 빈 문자열을 넣어야함
+            // 1. UI와 서버 타입을 분리했을 때 나타나는 이슈
           */}
+
           <option value={""}>코스 선택</option>
           {categories?.map((cat) => (
             <option key={cat.id} value={cat.id}>
@@ -158,7 +171,10 @@ function App() {
 
       <div className="border w-50">
         <div>이름: {form.title}</div>
-        {/* 이 UI때문에 form 상태의 카테고리를 객체로 value와 name을 가지는 객체로 만들 수 밖에 없음  */}
+        {/*
+          이 UI때문에 form 상태의 카테고리를 객체로 value와 name을 가지는 객체로 만들 수 밖에 없음 
+          UI와 서버 타입을 분리했을 때 나타나는 이슈
+         */}
         <div>선택한 카테고리: {form.categories?.name}</div>
         <div>가격: {form.price}</div>
         <div>isPublished: {form.isPublished + ""}</div>
