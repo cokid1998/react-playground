@@ -15,7 +15,7 @@ interface ServerPayload {
   isPublished: "Y" | "N";
 }
 
-interface UIState {
+interface Form {
   title: string;
   /*
     기획요구사항: select의 첫번째 option태그는 "코스 선택"을 보여줘야함
@@ -34,7 +34,7 @@ interface UIState {
 
 function App() {
   const [categories, setCategories] = useState<CategoriesResponse[]>([]);
-  const [form, setForm] = useState<UIState>({
+  const [form, setForm] = useState<Form>({
     title: "",
     categories: null,
     price: "",
