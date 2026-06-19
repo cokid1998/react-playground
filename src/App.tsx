@@ -1,36 +1,42 @@
 import { useEffect, useState } from "react";
-
-// 1. UI와 서버 타입을 분리했을 때 나타나는 이슈
-// 2. UI, 서버 타입 분리로 인해 작성해야하는 변환로직 이슈
+import { z } from "zod";
 
 interface CategoriesResponse {
   id: number;
   name: string;
 }
 
-interface ServerPayload {
-  title: string;
-  categoryId: number;
-  price: number;
-  isPublished: "Y" | "N";
-}
+// interface ServerPayload {
+//   title: string;
+//   categoryId: number;
+//   price: number;
+//   isPublished: "Y" | "N";
+// }
 
-interface Form {
-  title: string;
-  /*
-    기획요구사항: select의 첫번째 option태그는 "코스 선택"을 보여줘야함
-    categories 타입에 null이 추가 됨
-  */
-  // 1. UI와 서버 타입을 분리했을 때 나타나는 이슈
-  categories: CategoriesResponse | null;
-  /**
-   * 기획 요구사항: price는 콤마를 찍어야하며, 초기값은 0이아니라 빈문자열이여야한다.
-   * 그렇기 때문에 price는 number에서 string으로 바꿔야하는 상황이 됨
-   */
-  // 1. UI와 서버 타입을 분리했을 때 나타나는 이슈
-  price: string;
-  isPublished: boolean;
-}
+// interface Form {
+//   title: string;
+//   categories: CategoriesResponse | null;
+//   price: string;
+//   isPublished: boolean;
+// }
+
+// zod를 쓰면 데이터 변환과 타입정의를 한번에 할 수 있음
+const formSchema = z
+  .object({
+    title: z.string(),
+    categories: z.object({ id: z.number(), name: z.string() }).nullable(),
+    price: z.string(),
+    isPublished: z.boolean(),
+  })
+  .transform((form) => ({
+    title: form.title,
+    categoryId: form.categories?.id,
+    price: Number(form.price.replace(/,/g, "")),
+    isPublished: form.isPublished ? "Y" : "N",
+  }));
+
+type Form = z.input<typeof formSchema>;
+type ServerPayload = z.output<typeof formSchema>;
 
 function App() {
   const [categories, setCategories] = useState<CategoriesResponse[]>([]);
@@ -94,22 +100,21 @@ function App() {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 유효성 검사
-    if (!form.categories) {
-      alert("카테고리를 선택해주세요");
-      return;
-    }
+    // zod는 검증, 변환, 타입선언을 zod의 schema기능을 통해 하나로 묶어줌
+    const { data: payload, success } = formSchema.safeParse(form);
 
-    const payload: ServerPayload = {
-      title: form.title,
-      categoryId: form.categories.id,
-      // price에 넣어준 콤마를 제거하는 코드
-      // 2. UI, 서버 타입 분리로 인해 작성해야하는 변환로직 이슈
-      price: Number(form.price.replace(/,/g, "")),
-      // 변환로직
-      // 2. UI, 서버 타입 분리로 인해 작성해야하는 변환로직 이슈
-      isPublished: form.isPublished ? "Y" : "N",
-    };
+    // const payload: ServerPayload = {
+    //   title: form.title,
+    //   categoryId: form.categories.id,
+    //   // price에 넣어준 콤마를 제거하는 코드
+    //   // 2. UI, 서버 타입 분리로 인해 작성해야하는 변환로직 이슈
+    //   price: Number(form.price.replace(/,/g, "")),
+    //   // 변환로직
+    //   // 2. UI, 서버 타입 분리로 인해 작성해야하는 변환로직 이슈
+    //   isPublished: form.isPublished ? "Y" : "N",
+    // };
+
+    console.log(payload, success);
 
     const postData = async () => {
       const res = await fetch("http://localhost:3001/courses", {
